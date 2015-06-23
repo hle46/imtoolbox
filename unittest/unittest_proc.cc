@@ -5,11 +5,13 @@ using namespace imtoolbox;
 using namespace std;
 
 int main() {
+  /*
   auto mat0 = avg_folder<double>("n2.1/sample/", "avg1.png", 5);
   auto mat01 = imread<uint8_t>("avg1.png");
   auto mat02 = imread<uint8_t>("avg.png");              
   assert(mat01 == mat02);
   print_i("PASS!\n");
+  */
 
   matrix2<int> mat = {
       {1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12}, {13, 14, 15, 16}};
@@ -25,7 +27,7 @@ int main() {
   matrix1<int> mat2(0);
   assert(sum(mat2, 0) == 0);
 
-  print_i("PASS!\n");
+  println_i("PASS!");
 
   matrix2<int> h = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
 
@@ -92,7 +94,18 @@ int main() {
                            20, 7};
   auto pks = findpeaks(v.begin(), v.end());
   for (size_t i = 0; i < pks.size(); ++i) {
-    print_i(pks[i].first, ", ", pks[i].second + 1, "\n");
+    println_i(pks[i].first, ", ", pks[i].second + 1);
   }
+
+  matrix2<int> x, y;
+  std::tie(x, y) = meshgrid(g_slice<int>{-1, 1}, g_slice<int>{-2, 2});
+  assert(x == matrix2<int>({{-1,0,1},{-1,0,1},{-1,0,1},{-1,0,1},{-1,0,1}}));
+  assert(y == matrix2<int>({{-2,-2,-2},{-1,-1,-1},{0,0,0},{1,1,1},{2,2,2}}));
+  println_i("PASS!");
+
+
+  println_i(fspecial_gaussian<double>(std::make_pair(3, 3), 0.5));
+  //println_i(fspecial<double>(fspecial_t::gaussian, std::make_pair(4, 4), 0.5));
+  //println_i(fspecial<double>(fspecial_t::average, std::make_pair(4, 4));
   return 0;
 }

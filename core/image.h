@@ -116,6 +116,7 @@ template <> matrix3<uint8_t> imread_jpeg(const char *file_name) {
 
   jpeg_start_decompress(&cinfo); // Start decompressor
 
+  println_i(typeid(cinfo.output_components).name());
   matrix3<uint8_t> mat(cinfo.output_height, cinfo.output_width,
                        cinfo.output_components); // Return result
 

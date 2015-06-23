@@ -4,7 +4,10 @@
 #include <iostream>
 namespace imtoolbox {
 
-template <class T>
+// This is used to ignore compiler warning of unused variables
+template <typename T> void ignore(const T &) {}
+
+template <typename T>
 inline typename std::enable_if<!std::numeric_limits<T>::is_integer, bool>::type
 almost_equal(const T &x, const T &y, int ulp = 1) {
   // the machine epsilon has to be scaled to the magnitude of the values used
@@ -15,8 +18,6 @@ almost_equal(const T &x, const T &y, int ulp = 1) {
          ||
          std::abs(x - y) < std::numeric_limits<T>::min();
 }
-
-enum class filter2_t { valid, same, full };
 
 enum class sort_t { none, descend, ascend };
 
@@ -48,6 +49,14 @@ inline void print_e(const Args &... args) {
   std::cerr << os_color::def;
 }
 
+template <typename... Args>
+inline void println_e(const Args &... args) {
+  std::cerr << os_color::yellow;
+  print_e_helper(args...);
+  std::cerr << os_color::def;
+  std::cerr << "\n";
+}
+
 inline void print_i_helper() {}
 
 template <typename T, typename... Args>
@@ -61,6 +70,14 @@ inline void print_i(const Args &... args) {
   std::cout << os_color::yellow;
   print_e_helper(args...);
   std::cout << os_color::def;
+}
+
+template <typename... Args>
+inline void println_i(const Args &... args) {
+  std::cout << os_color::yellow;
+  print_e_helper(args...);
+  std::cout << os_color::def;
+  std::cout << "\n";
 }
 #endif
 } // namespace imtoolbox

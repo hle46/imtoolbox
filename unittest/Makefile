@@ -1,5 +1,5 @@
 CC = clang++
-CFLAGS = -Wall -Wextra -std=c++11 -g -O3
+CFLAGS = -Wall -Wextra -std=c++11 -g
 LDFLAGS = -I/usr/local/lib -ljpeg -lpng
 LIBS = -stdlib=libc++
 SRCS = $(wildcard *.cc)

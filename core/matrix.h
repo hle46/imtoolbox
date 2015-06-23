@@ -280,9 +280,6 @@ template <typename T> void fast_pow(T &x, int n) {
   x = std::move(acc);
 }
 
-// This is used to ignore compiler warning of unused variables
-template <class T> void ignore(const T &) {}
-
 //-----------------------------------------------------------------------------
 //                            matrix_slice
 //-----------------------------------------------------------------------------
@@ -356,8 +353,7 @@ template <size_t N> struct matrix_slice {
     return do_slice_dim<D>(out, slice{n, n, 1});
   }
 
-  template <typename... Args> size_t do_slice(matrix_slice<N> &out) const {
-    ignore(out);
+  template <typename... Args> size_t do_slice(matrix_slice<N> &) const {
     return 0;
   }
 
@@ -534,9 +530,7 @@ public:
   }
 
   // May lead to memory leak
-  matrix_ref(matrix<value_type, N>&&) = delete;
-
- 
+  matrix_ref(matrix<value_type, N> &&) = delete;
 
   matrix<T, N> clone() const {
     matrix<T, N> ret(*this);

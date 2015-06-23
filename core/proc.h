@@ -1,5 +1,6 @@
 #ifndef IMTOOLBOX_PROC
 #define IMTOOLBOX_PROC
+
 namespace imtoolbox {
 // Average images in a folder
 template <typename T>
@@ -60,6 +61,13 @@ template <typename T>
 inline matrix<T, 0> sum(const matrix<T, 1> &m, size_t dim = 0) {
   assert(dim == 0);
   return std::accumulate(m.begin(), m.end(), static_cast<T>(0));
+}
+
+template <typename M>
+inline enable_if_t<is_matrix<M>(), typename M::value_type>
+sum_all(const M &mat) {
+  using value_t = typename M::value_type;
+  return std::accumulate(mat.begin(), mat.end(), static_cast<value_t>(0));
 }
 
 // filter2
@@ -184,6 +192,8 @@ filter2_same(const H &h, const M &m) {
   return ret;
 }
 
+enum class filter2_t { valid, same, full };
+
 template <typename M, typename H>
 enable_if_t<
     is_matrix<M>() && is_matrix<H>() && M::order == 2 && H::order == 2 &&
@@ -306,5 +316,94 @@ findpeaks(const V &v, sort_t st,
   }), pks.end());
   return pks;
 }
+
+template <typename T> struct g_slice {
+  T start;
+  T end;
+  T inc;
+  explicit g_slice(T s, T e, T n = static_cast<T>(1))
+      : start(s), end(e), inc(n) {
+    assert(s <= e);
+  }
+};
+
+template <typename T>
+enable_if_t<is_arithmetic<T>(), std::pair<matrix2<T>, matrix2<T>>>
+meshgrid(const g_slice<T> &gs1, const g_slice<T> &gs2) {
+  size_t w = (gs1.end - gs1.start) / gs1.inc + 1;
+  size_t h = (gs2.end - gs2.start) / gs2.inc + 1;
+  matrix2<T> x(h, w);
+  auto iter = x.begin();
+  T val = gs1.start;
+  T inc = gs1.inc;
+  for (size_t i = 0; i < h; ++i) {
+    val = gs1.start;
+    for (size_t j = 0; j < w; ++j) {
+      *iter = val;
+      val += inc;
+      ++iter;
+    }
+  }
+
+  matrix2<T> y(h, w);
+  iter = y.begin();
+  val = gs2.start;
+  inc = gs2.inc;
+  for (size_t i = 0; i < h; ++i) {
+    for (size_t j = 0; j < w; ++j) {
+      *iter = val;
+      ++iter;
+    }
+    val += inc;
+  }
+
+  return std::make_pair(std::move(x), std::move(y));
 }
+
+template <typename T, size_t N, typename... Args>
+inline matrix<T, N> zeros(Args... args) {
+  matrix<T, N> m(args...);
+  std::fill(m.begin(), m.end(), static_cast<T>(0));
+  return m;
+}
+
+template <typename T, size_t N, typename... Args>
+inline matrix<T, N> ones(Args... args) {
+  matrix<T, N> m(args...);
+  std::fill(m.begin(), m.end(), static_cast<T>(1));
+  return m;
+}
+
+template <typename T>
+inline enable_if_t<is_floating_point<T>(), matrix2<T>>
+fspecial_gaussian(const std::pair<int, int> &siz, T std) {
+  assert(siz.first >= 0 && siz.second >= 0);
+  T siz1 = (siz.first - 1) / 2.0;
+  T siz2 = (siz.second - 1) / 2.0;
+
+  matrix2<T> h(siz.first, siz.second);
+  auto h_iter = h.begin();
+  T sigma = 2 * std * std;
+  for (T x = -siz1; x <= siz1; ++x) {
+    for (T y = -siz2; y <= siz2; ++y) {
+      *h_iter = std::exp(-(x * x + y * y) / sigma);
+      ++h_iter;
+    }
+  }
+
+  T sumh = sum_all(h);
+  h /= sumh;
+  return h;
+}
+
+template <typename T>
+inline enable_if_t<is_floating_point<T>(), matrix2<T>>
+fspecial_average(const std::pair<int, int> &siz) {
+  matrix2<T> h = ones<T, 2>(siz.first, siz.second);
+  T sumh = h.size(0) * h.size(1);
+  h /= sumh;
+  return h;
+}
+
+} // namespace imtoolbox
 #endif
