@@ -71,17 +71,12 @@ sum_all(const M &mat) {
 }
 
 // filter2
-template <typename M, typename H>
-enable_if_t<
-    is_matrix<M>() && is_matrix<H>() && M::order == 2 && H::order == 2 &&
-        is_compatible<typename M::value_type, typename H::value_type>(),
-    matrix2<conditional_t<
-        is_convertible<typename H::value_type, typename M::value_type>(),
-        typename M::value_type, typename H::value_type>>>
+template <typename H, typename M>
+inline enable_if_t<
+    is_matrix<H>() && H::order == 2 && is_matrix<M>() && M::order == 2,
+    matrix2<common_type_t<typename H::value_type, typename M::value_type>>>
 filter2_valid(const H &h, const M &m) {
-  using value_t = conditional_t<
-      is_convertible<typename H::value_type, typename M::value_type>(),
-      typename M::value_type, typename H::value_type>;
+  using value_t = common_type_t<typename M::value_type, typename H::value_type>;
 
   if (is_empty(h)) {
     return matrix2<value_t>{m.descriptor(), static_cast<value_t>(0)};
@@ -105,17 +100,12 @@ filter2_valid(const H &h, const M &m) {
   return ret;
 }
 
-template <typename M, typename H>
-enable_if_t<
-    is_matrix<M>() && is_matrix<H>() && M::order == 2 && H::order == 2 &&
-        is_compatible<typename M::value_type, typename H::value_type>(),
-    matrix2<conditional_t<
-        is_convertible<typename H::value_type, typename M::value_type>(),
-        typename M::value_type, typename H::value_type>>>
+template <typename H, typename M>
+inline enable_if_t<
+    is_matrix<H>() && H::order == 2 && is_matrix<M>() && M::order == 2,
+    matrix2<common_type_t<typename H::value_type, typename M::value_type>>>
 filter2_full(const H &h, const M &m) {
-  using value_t = conditional_t<
-      is_convertible<typename H::value_type, typename M::value_type>(),
-      typename M::value_type, typename H::value_type>;
+  using value_t = common_type_t<typename M::value_type, typename H::value_type>;
 
   if (is_empty(h)) {
     return matrix2<value_t>{m.descriptor(), static_cast<value_t>(0)};
@@ -149,17 +139,12 @@ filter2_full(const H &h, const M &m) {
   return ret;
 }
 
-template <typename M, typename H>
-enable_if_t<
-    is_matrix<M>() && is_matrix<H>() && M::order == 2 && H::order == 2 &&
-        is_compatible<typename M::value_type, typename H::value_type>(),
-    matrix2<conditional_t<
-        is_convertible<typename H::value_type, typename M::value_type>(),
-        typename M::value_type, typename H::value_type>>>
+template <typename H, typename M>
+inline enable_if_t<
+    is_matrix<H>() && H::order == 2 && is_matrix<M>() && M::order == 2,
+    matrix2<common_type_t<typename H::value_type, typename M::value_type>>>
 filter2_same(const H &h, const M &m) {
-  using value_t = conditional_t<
-      is_convertible<typename H::value_type, typename M::value_type>(),
-      typename M::value_type, typename H::value_type>;
+  using value_t = common_type_t<typename M::value_type, typename H::value_type>;
 
   if (is_empty(h)) {
     return matrix2<value_t>{m.descriptor(), static_cast<value_t>(0)};
@@ -194,13 +179,10 @@ filter2_same(const H &h, const M &m) {
 
 enum class filter2_t { valid, same, full };
 
-template <typename M, typename H>
-enable_if_t<
-    is_matrix<M>() && is_matrix<H>() && M::order == 2 && H::order == 2 &&
-        is_compatible<typename M::value_type, typename H::value_type>(),
-    matrix2<conditional_t<
-        is_convertible<typename H::value_type, typename M::value_type>(),
-        typename M::value_type, typename H::value_type>>>
+template <typename H, typename M>
+inline enable_if_t<
+    is_matrix<H>() && H::order == 2 && is_matrix<M>() && M::order == 2,
+    matrix2<common_type_t<typename H::value_type, typename M::value_type>>>
 filter2(const H &h, const M &m, filter2_t ft = filter2_t::same) {
   switch (ft) {
   case filter2_t::valid:
@@ -210,6 +192,14 @@ filter2(const H &h, const M &m, filter2_t ft = filter2_t::same) {
   case filter2_t::same:
     return filter2_same(h, m);
   }
+}
+
+template <typename T, typename M>
+inline enable_if_t<is_matrix<M>() && M::order == 2,
+                   matrix2<common_type_t<T, typename M::value_type>>>
+filter2(std::initializer_list<std::initializer_list<T>> h, const M &m,
+        filter2_t ft = filter2_t::same) {
+  return filter2(matrix2<T>(h), m, ft);
 }
 
 // findpeaks
@@ -394,6 +384,12 @@ fspecial_gaussian(const std::pair<int, int> &siz, T std) {
   T sumh = sum_all(h);
   h /= sumh;
   return h;
+}
+
+template <typename T>
+inline enable_if_t<is_floating_point<T>(), matrix2<T>>
+fspecial_gaussian(int siz, const T &std) {
+  return fspecial_gaussian(std::make_pair(siz, siz), std);
 }
 
 template <typename T>

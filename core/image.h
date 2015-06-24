@@ -20,7 +20,7 @@ typedef struct my_error_mgr *my_error_ptr;
 template <typename T> matrix3<T> imread_jpeg(const char *file_name) {
   FILE *fp{fopen(file_name, "rb")}; // Open file
   if (fp == nullptr) {
-    print_e("File not found\n");
+    println_e("File not found");
     throw std::exception();
   }
 
@@ -32,7 +32,7 @@ template <typename T> matrix3<T> imread_jpeg(const char *file_name) {
   jerr.pub.error_exit = [](j_common_ptr cinfo) {
     char jmsg[JMSG_LENGTH_MAX];
     (*cinfo->err->format_message)(cinfo, jmsg);
-    print_e(jmsg, "\n");
+    println_e(jmsg);
     my_error_ptr myerr =
         (my_error_ptr)
             cinfo->err; // Hack! err points to the beginning of my_error_ptr
@@ -86,7 +86,7 @@ template <typename T> matrix3<T> imread_jpeg(const char *file_name) {
 template <> matrix3<uint8_t> imread_jpeg(const char *file_name) {
   FILE *fp{fopen(file_name, "rb")}; // Open file
   if (fp == nullptr) {
-    print_e("File not found\n");
+    println_e("File not found");
     throw std::exception();
   }
 
@@ -98,7 +98,7 @@ template <> matrix3<uint8_t> imread_jpeg(const char *file_name) {
   jerr.pub.error_exit = [](j_common_ptr cinfo) {
     char jmsg[JMSG_LENGTH_MAX];
     (*cinfo->err->format_message)(cinfo, jmsg);
-    print_e(jmsg, "\n");
+    println_e(jmsg);
     my_error_ptr myerr = (my_error_ptr)cinfo->err;
     longjmp(myerr->setjmp_buffer, 1);
   };
@@ -116,7 +116,6 @@ template <> matrix3<uint8_t> imread_jpeg(const char *file_name) {
 
   jpeg_start_decompress(&cinfo); // Start decompressor
 
-  println_i(typeid(cinfo.output_components).name());
   matrix3<uint8_t> mat(cinfo.output_height, cinfo.output_width,
                        cinfo.output_components); // Return result
 
@@ -142,7 +141,7 @@ imwrite_jpeg(const M &mat, const char *file_name, uint quality = 100) {
   static_assert(M::order == 2 || M::order == 3, "Invalid image");
   FILE *fp{fopen(file_name, "wb")}; // Open file
   if (fp == nullptr) {
-    print_e("File not found\n");
+    println_e("File not found");
     throw std::exception();
   }
 
@@ -154,7 +153,7 @@ imwrite_jpeg(const M &mat, const char *file_name, uint quality = 100) {
   jerr.pub.error_exit = [](j_common_ptr cinfo) {
     char jmsg[JMSG_LENGTH_MAX];
     (*cinfo->err->format_message)(cinfo, jmsg);
-    print_e(jmsg, "\n");
+    println_e(jmsg);
     my_error_ptr myerr = (my_error_ptr)cinfo->err;
     longjmp(myerr->setjmp_buffer, 1);
   };
@@ -204,7 +203,7 @@ imwrite_jpeg(const M &mat, const char *file_name, uint quality = 100) {
   static_assert(M::order == 2 || M::order == 3, "Invalid image");
   FILE *fp{fopen(file_name, "wb")}; // Open file
   if (fp == nullptr) {
-    print_e("File not found\n");
+    println_e("File not found");
     throw std::exception();
   }
 
@@ -216,7 +215,7 @@ imwrite_jpeg(const M &mat, const char *file_name, uint quality = 100) {
   jerr.pub.error_exit = [](j_common_ptr cinfo) {
     char jmsg[JMSG_LENGTH_MAX];
     (*cinfo->err->format_message)(cinfo, jmsg);
-    print_e(jmsg, "\n");
+    println_e(jmsg);
     my_error_ptr myerr = (my_error_ptr)cinfo->err;
     longjmp(myerr->setjmp_buffer, 1);
   };
@@ -258,7 +257,7 @@ imwrite_jpeg(const M &mat, const char *file_name, uint quality = 100) {
 template <typename T> matrix3<T> imread_png(const char *file_name) {
   FILE *fp{fopen(file_name, "rb")};
   if (fp == nullptr) {
-    print_e("File not found\n");
+    println_e("File not found");
     throw std::exception();
   }
 
@@ -299,12 +298,12 @@ template <typename T> matrix3<T> imread_png(const char *file_name) {
                &interlace_type, nullptr, nullptr);
 
   if (bit_depth != 8) {
-    print_e("Not support bit depth different than 8 for now\n");
+    println_e("Not support bit depth different than 8 for now");
     longjmp(png_jmpbuf(png_ptr), 1);
   }
 
   if (interlace_type != PNG_INTERLACE_NONE) {
-    print_e("Not support interlace for now\n");
+    println_e("Not support interlace for now");
     longjmp(png_jmpbuf(png_ptr), 1);
   }
 
@@ -317,7 +316,7 @@ template <typename T> matrix3<T> imread_png(const char *file_name) {
     depth = 3;
     break;
   default:
-    print_e("Color type is not supported\n");
+    println_e("Color type is not supported");
     longjmp(png_jmpbuf(png_ptr), 1);
   }
 
@@ -353,7 +352,7 @@ template <typename T> matrix3<T> imread_png(const char *file_name) {
 template <> matrix3<uint8_t> imread_png(const char *file_name) {
   FILE *fp{fopen(file_name, "rb")};
   if (fp == nullptr) {
-    print_e("File not found\n");
+    println_e("File not found");
     throw std::exception();
   }
 
@@ -394,12 +393,12 @@ template <> matrix3<uint8_t> imread_png(const char *file_name) {
                &interlace_type, nullptr, nullptr);
 
   if (bit_depth != 8) {
-    print_e("Not support bit depth different than 8 for now\n");
+    println_e("Not support bit depth different than 8 for now");
     longjmp(png_jmpbuf(png_ptr), 1);
   }
 
   if (interlace_type != PNG_INTERLACE_NONE) {
-    print_e("Not support interlace for now\n");
+    println_e("Not support interlace for now");
     longjmp(png_jmpbuf(png_ptr), 1);
   }
 
@@ -412,7 +411,7 @@ template <> matrix3<uint8_t> imread_png(const char *file_name) {
     depth = 3;
     break;
   default:
-    print_e("Color type is not supported\n");
+    println_e("Color type is not supported");
     longjmp(png_jmpbuf(png_ptr), 1);
   }
 
@@ -443,7 +442,7 @@ imwrite_png(const M &mat, const char *file_name) {
   static_assert(M::order == 2 || M::order == 3, "Invalid image");
   FILE *fp{fopen(file_name, "wb")};
   if (fp == nullptr) {
-    print_e("File not found\n");
+    println_e("File not found");
     throw std::exception();
   }
 
@@ -492,7 +491,7 @@ imwrite_png(const M &mat, const char *file_name) {
     color_type = PNG_COLOR_TYPE_RGB;
     break;
   default:
-    print_e("Invalid color type\n");
+    println_e("Invalid color type");
     longjmp(png_jmpbuf(png_ptr), 1);
   }
 
@@ -529,7 +528,7 @@ imwrite_png(const M &mat, const char *file_name) {
   static_assert(M::order == 2 || M::order == 3, "Invalid image");
   FILE *fp{fopen(file_name, "wb")};
   if (fp == nullptr) {
-    print_e("File not found\n");
+    println_e("File not found");
     throw std::exception();
   }
 
@@ -578,7 +577,7 @@ imwrite_png(const M &mat, const char *file_name) {
     color_type = PNG_COLOR_TYPE_RGB;
     break;
   default:
-    print_e("Invalid color type\n");
+    println_e("Invalid color type");
     longjmp(png_jmpbuf(png_ptr), 1);
   }
 
@@ -633,7 +632,7 @@ bool is_jpeg(const uint8_t *sig) {
 template <typename T> inline matrix3<T> imread(const char *file_name) {
   FILE *fp{fopen(file_name, "rb")};
   if (fp == nullptr) {
-    print_e("File not found\n");
+    println_e("File not found");
     throw std::exception();
   }
 
@@ -651,7 +650,7 @@ template <typename T> inline matrix3<T> imread(const char *file_name) {
   } else if (is_jpeg(sig)) {
     return imread_jpeg<T>(file_name);
   } else {
-    print_e("File type isn't supported\n");
+    println_e("File type isn't supported");
     throw std::exception();
   }
 }
@@ -673,7 +672,7 @@ enable_if_t<is_matrix<M>(), void> imwrite(const M &mat,
   }
 
   if (last_pch == nullptr) {
-    print_e("No extension supplied\n");
+    println_e("No extension supplied");
     throw std::exception();
   }
 
@@ -685,7 +684,7 @@ enable_if_t<is_matrix<M>(), void> imwrite(const M &mat,
              strncmp(last_pch, "jpeg", 4) == 0) {
     imwrite_jpeg(mat, file_name);
   } else {
-    print_e("Unknown extension\n");
+    println_e("Unknown extension");
     throw std::exception();
   }
 }

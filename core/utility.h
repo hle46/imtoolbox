@@ -2,6 +2,7 @@
 #define IMTOOLBOX_ULTILITY_H
 
 #include <iostream>
+#include <sys/stat.h>
 namespace imtoolbox {
 
 // This is used to ignore compiler warning of unused variables
@@ -21,7 +22,11 @@ almost_equal(const T &x, const T &y, int ulp = 1) {
 
 enum class sort_t { none, descend, ascend };
 
+#ifdef DEBUG
 #ifdef ANDROID
+
+// TODO: Equivalent functions to android
+
 #else
 namespace os_color {
 constexpr const char *def = "\033[0m";
@@ -75,6 +80,14 @@ inline void println_i(const Args &... args) {
   std::cout << os_color::def;
   std::cout << "\n";
 }
-#endif
+
+bool exist(const char *file_name) {
+  struct stat sb;
+  return stat(file_name, &sb) == 0;
+}
+#endif // ANDROID
+#else 
+// TODO: Write to log file in release mode
+#endif // DEBUG
 } // namespace imtoolbox
 #endif // IMTOOLBOX_ULTILITY_H

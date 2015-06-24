@@ -33,9 +33,8 @@ template <typename T, typename U> constexpr bool is_convertible() {
   return std::is_convertible<T, U>::value;
 }
 
-template <typename T, typename U> constexpr bool is_compatible() {
-  return is_convertible<T, U>() || is_convertible<U, T>();
-}
+template <typename... T>
+using common_type_t = typename std::common_type<T...>::type;
 
 struct subst_failure {};
 
