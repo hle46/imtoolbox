@@ -405,5 +405,44 @@ fspecial_average(const std::pair<int, int> &siz) {
   return h;
 }
 
+template <typename M>
+enable_if_t<is_matrix<M>() && M::order == 3 &&
+                is_floating_point<typename M::value_type>(),
+            matrix3<typename M::value_type>>
+rgb2ycbcr(const M &m) {
+  assert(m.size(2) == 3);
+  using value_t = typename M::value_type;
+  matrix3<value_t> ret(m.size(0), m.size(1), m.size(2));
+  value_t r, g, b;
+  auto p = ret.begin();
+  for (auto first = m.begin(), last = m.end(); first != last; ++first) {
+    r = *first / 255.;
+    g = *++first / 255.;
+    b = *++first / 255.;
+    *p = 65.481 * r + 128.553 * g + 24.966 * b + 16;
+    *++p = -37.797 * r - 74.203 * g + 112 * b + 128;
+    *++p = 112 * r - 93.786 * g - 18.214 * b + 128;
+    ++p;
+  }
+  return ret;
+}
+
+template <typename M>
+enable_if_t<is_matrix<M>() && M::order == 3 &&
+                is_floating_point<typename M::value_type>(),
+            matrix2<typename M::value_type>>
+rgb2y(const M &m) {
+  assert(m.size(2) == 3);
+  using value_t = typename M::value_type;
+  matrix2<value_t> ret(m.size(0), m.size(1));
+  auto p = ret.begin();
+  for (auto first = m.begin(), last = m.end(); first != last; ++first) {
+    *p += 65.481 * (*first / 255.);
+    *p += 128.553 * (*++first / 255.);
+    *p += 24.966 * (*++first / 255.) + 16;
+    ++p;
+  }
+  return ret;
+}
 } // namespace imtoolbox
 #endif

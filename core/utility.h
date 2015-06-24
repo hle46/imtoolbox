@@ -34,48 +34,44 @@ const char *cyan = "\033[1;36m";
 const char *white = "\033[1;37m";
 } // namespace os_color
 
-inline void print_e_helper() {}
+inline void print_helper() {}
+
+template <typename T> inline void print_helper(std::ostream &os, const T &t) {
+  os << t;
+}
 
 template <typename T, typename... Args>
-inline void print_e_helper(const T &t, const Args &... args) {
-  std::cerr << t;
-  print_e_helper(args...);
+inline void print_helper(std::ostream &os, const T &t, const Args &... args) {
+  std::cerr << t << ", ";
+  print_helper(os, args...);
 }
 
 template <typename... Args>
 inline void print_e(const Args &... args) {
-  std::cerr << os_color::yellow;
-  print_e_helper(args...);
+  std::cerr << os_color::red;
+  print_helper(std::cerr, args...);
   std::cerr << os_color::def;
 }
 
 template <typename... Args>
 inline void println_e(const Args &... args) {
-  std::cerr << os_color::yellow;
-  print_e_helper(args...);
+  std::cerr << os_color::red;
+  print_helper(std::cerr, args...);
   std::cerr << os_color::def;
   std::cerr << "\n";
-}
-
-inline void print_i_helper() {}
-
-template <typename T, typename... Args>
-inline void print_i_helper(const T &t, const Args &... args) {
-  std::cout << t;
-  print_i_helper(args...);
 }
 
 template <typename... Args>
 inline void print_i(const Args &... args) {
   std::cout << os_color::yellow;
-  print_e_helper(args...);
+  print_helper(std::cout, args...);
   std::cout << os_color::def;
 }
 
 template <typename... Args>
 inline void println_i(const Args &... args) {
   std::cout << os_color::yellow;
-  print_e_helper(args...);
+  print_helper(std::cout, args...);
   std::cout << os_color::def;
   std::cout << "\n";
 }

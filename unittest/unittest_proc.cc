@@ -8,7 +8,7 @@ int main() {
   /*
   auto mat0 = avg_folder<double>("n2.1/sample/", "avg1.png", 5);
   auto mat01 = imread<uint8_t>("avg1.png");
-  auto mat02 = imread<uint8_t>("avg.png");              
+  auto mat02 = imread<uint8_t>("avg.png");
   assert(mat01 == mat02);
   print_i("PASS!\n");
   */
@@ -27,7 +27,7 @@ int main() {
   matrix1<int> mat2(0);
   assert(sum(mat2, 0) == 0);
 
-  println_i("PASS!");
+  println_i("sum: PASS!");
 
   matrix2<int> h = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
 
@@ -87,25 +87,35 @@ int main() {
                                                           {41, 44, 47, 16}}));
 
   assert(filter2(m, h1, filter2_t::same) == matrix2<int>({{94, 84}, {54, 44}}));
-  print_i("PASS!\n");
+  print_i("filter2: PASS!\n");
 
-  std::vector<double> v = {25, 8, 15, 5, 6, 10,
-                           10 + std::numeric_limits<double>::epsilon(), 3, 1,
-                           20, 7};
+  std::vector<int> v = {25, 8, 15, 5, 6, 10, 10, 3, 1, 20, 7};
   auto pks = findpeaks(v.begin(), v.end());
-  for (size_t i = 0; i < pks.size(); ++i) {
-    println_i(pks[i].first, ", ", pks[i].second + 1);
-  }
+  assert(pks.size() == 3);
+  assert(pks[0].first == 15 && pks[0].second == 2);
+  assert(pks[1].first == 10 && pks[1].second == 5);
+  assert(pks[2].first == 20 && pks[2].second == 9);
+  println_i("findpeaks: PASS!");
 
   matrix2<int> x, y;
   std::tie(x, y) = meshgrid(g_slice<int>{-1, 1}, g_slice<int>{-2, 2});
-  assert(x == matrix2<int>({{-1,0,1},{-1,0,1},{-1,0,1},{-1,0,1},{-1,0,1}}));
-  assert(y == matrix2<int>({{-2,-2,-2},{-1,-1,-1},{0,0,0},{1,1,1},{2,2,2}}));
-  println_i("PASS!");
+  assert(x ==
+         matrix2<int>(
+             {{-1, 0, 1}, {-1, 0, 1}, {-1, 0, 1}, {-1, 0, 1}, {-1, 0, 1}}));
+  assert(y ==
+         matrix2<int>(
+             {{-2, -2, -2}, {-1, -1, -1}, {0, 0, 0}, {1, 1, 1}, {2, 2, 2}}));
+  println_i("meshgrid: PASS!");
 
+  auto m2 = imread<double>("avg.png");
 
-  println_i(fspecial_gaussian<double>(std::make_pair(3, 3), 0.5));
-  //println_i(fspecial<double>(fspecial_t::gaussian, std::make_pair(4, 4), 0.5));
-  //println_i(fspecial<double>(fspecial_t::average, std::make_pair(4, 4));
+  auto m3 = rgb2ycbcr(m2);
+  auto m4 = rgb2y(m2);
+  assert(almost_equal(m3(0, 0, 0) / 255, (m4(0, 0) / 255)));
+  assert(almost_equal(m3(512, 256, 0) / 255, m4(512, 256) / 255));
+  assert(almost_equal(m3(128, 512, 0) / 255, m4(128, 512) / 255));
+  assert(almost_equal(m3(m3.size(0) - 1, m3.size(1) - 1, 0) / 255,
+                      m4(m4.size(0) - 1, m4.size(1) - 1) / 255));
+  println_i("rgb2ycbcr: PASS!");
   return 0;
 }
