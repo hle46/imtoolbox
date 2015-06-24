@@ -1,6 +1,7 @@
 #ifndef IMTOOLBOX_PROC
 #define IMTOOLBOX_PROC
 
+#include <tuple>
 namespace imtoolbox {
 // Average images in a folder
 template <typename T>
@@ -77,7 +78,6 @@ inline enable_if_t<
     matrix2<common_type_t<typename H::value_type, typename M::value_type>>>
 filter2_valid(const H &h, const M &m) {
   using value_t = common_type_t<typename M::value_type, typename H::value_type>;
-
   if (is_empty(h)) {
     return matrix2<value_t>{m.descriptor(), static_cast<value_t>(0)};
   }
@@ -91,7 +91,7 @@ filter2_valid(const H &h, const M &m) {
   auto ret_ptr = ret.begin();
   for (size_t i = 0; i < ret.rows(); ++i) {
     for (size_t j = 0; j < ret.cols(); ++j) {
-      auto m1 = m(slice{i, i + h.rows() - 1}, slice{j, j + h.rows() - 1});
+      auto m1 = m(slice{i, i + h.rows() - 1}, slice{j, j + h.cols() - 1});
       *ret_ptr = std::inner_product(h.begin(), h.end(), m1.begin(),
                                     static_cast<value_t>(0));
       ++ret_ptr;
@@ -130,7 +130,7 @@ filter2_full(const H &h, const M &m) {
   auto ret_ptr = ret.begin();
   for (size_t i = 0; i < ret.rows(); ++i) {
     for (size_t j = 0; j < ret.cols(); ++j) {
-      auto m1 = m_pad(slice{i, i + h.rows() - 1}, slice{j, j + h.rows() - 1});
+      auto m1 = m_pad(slice{i, i + h.rows() - 1}, slice{j, j + h.cols() - 1});
       *ret_ptr = std::inner_product(h.begin(), h.end(), m1.begin(),
                                     static_cast<value_t>(0));
       ++ret_ptr;
@@ -168,7 +168,7 @@ filter2_same(const H &h, const M &m) {
   auto ret_ptr = ret.begin();
   for (size_t i = 0; i < ret.rows(); ++i) {
     for (size_t j = 0; j < ret.cols(); ++j) {
-      auto m1 = m_pad(slice{i, i + h.rows() - 1}, slice{j, j + h.rows() - 1});
+      auto m1 = m_pad(slice{i, i + h.rows() - 1}, slice{j, j + h.cols() - 1});
       *ret_ptr = std::inner_product(h.begin(), h.end(), m1.begin(),
                                     static_cast<value_t>(0));
       ++ret_ptr;
@@ -184,14 +184,20 @@ inline enable_if_t<
     is_matrix<H>() && H::order == 2 && is_matrix<M>() && M::order == 2,
     matrix2<common_type_t<typename H::value_type, typename M::value_type>>>
 filter2(const H &h, const M &m, filter2_t ft = filter2_t::same) {
+  using value_t = common_type_t<typename H::value_type, typename M::value_type>;
+  matrix2<value_t> ret;
   switch (ft) {
   case filter2_t::valid:
-    return filter2_valid(h, m);
+    ret = filter2_valid(h, m);
+    break;
   case filter2_t::full:
-    return filter2_full(h, m);
+    ret = filter2_full(h, m);
+    break;
   case filter2_t::same:
-    return filter2_same(h, m);
+    ret = filter2_same(h, m);
+    break;
   }
+  return ret;
 }
 
 template <typename T, typename M>

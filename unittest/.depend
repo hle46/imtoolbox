@@ -1,6 +1,6 @@
 unittest_image.o: unittest_image.cc ../imtoolbox.h ../core/traits.h \
-  ../core/utility.h ../core/matrix.h ../core/image.h ../core/proc.h
+ ../core/utility.h ../core/matrix.h ../core/image.h ../core/proc.h
 unittest_matrix.o: unittest_matrix.cc ../imtoolbox.h ../core/traits.h \
-  ../core/utility.h ../core/matrix.h ../core/image.h ../core/proc.h
+ ../core/utility.h ../core/matrix.h ../core/image.h ../core/proc.h
 unittest_proc.o: unittest_proc.cc ../imtoolbox.h ../core/traits.h \
-  ../core/utility.h ../core/matrix.h ../core/image.h ../core/proc.h
+ ../core/utility.h ../core/matrix.h ../core/image.h ../core/proc.h
